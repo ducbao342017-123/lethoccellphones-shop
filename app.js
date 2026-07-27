@@ -226,7 +226,7 @@
               localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
             } catch(err) {}
 
-            renderAll();
+            renderAllSafe();  // Safe: KHÔNG reset form inputs đang gõ
           }
           updateCloudBadge(true);
         } else {
@@ -264,7 +264,24 @@
     renderCart();
   }
 
+  // renderAll nhưng KHÔNG reset form admin (dùng khi sync cloud)
+  function renderAllSafe() {
+    renderProducts();
+    renderAdminProductsTable();
+    renderTestimonials();
+    renderAdminTestimonialsTable();
+    applySettingsUI();  // Chỉ cập nhật giao diện công khai, KHÔNG reset form
+    renderCart();
+  }
+
   function applySettings() {
+    applySettingsUI();
+    applySettingsForm();
+  }
+
+  // Chỉ cập nhật giao diện công khai (logo, footer, hero, credibility...)
+  // AN TOÀN để gọi bất cứ lúc nào kể cả khi admin modal đang mở
+  function applySettingsUI() {
     var s = state.settings || DEFAULT_SETTINGS;
     var logo = document.getElementById("header-logo");
     if (logo) logo.innerHTML = (s.storeName || "LETHOCCELLPHONE'S").toUpperCase() + '<span>.</span>';
@@ -304,6 +321,26 @@
     var c4t = document.getElementById("cred-title-4"); if (c4t) c4t.textContent = s.cred4T || "Hỗ Trợ Kỹ Thuật 24/7";
     var c4d = document.getElementById("cred-desc-4"); if (c4d) c4d.textContent = s.cred4D || "Đội ngũ kỹ thuật tư vấn chuyên nghiệp...";
 
+    var cleanHotline = (s.hotline || "0934338765").replace(/\s+/g, "");
+    var cleanZalo = (s.zalo || "0934338765").replace(/\s+/g, "");
+
+    var floatCall = document.getElementById("float-call-btn");
+    if (floatCall) {
+      floatCall.href = "tel:" + cleanHotline;
+      var callSpan = floatCall.querySelector("span");
+      if (callSpan) callSpan.textContent = "Hotline: " + (s.hotline || "0934338765");
+    }
+
+    var floatZalo = document.getElementById("float-zalo-btn");
+    if (floatZalo) {
+      floatZalo.href = "https://zalo.me/" + cleanZalo;
+    }
+  }
+
+  // Chỉ cập nhật các ô input trong form admin settings
+  // KHÔNG gọi hàm này khi đang sync cloud (để tránh xóa text đang gõ)
+  function applySettingsForm() {
+    var s = state.settings || DEFAULT_SETTINGS;
     var asStore = document.getElementById("as-storename"); if (asStore) asStore.value = s.storeName || "";
     var asHotline = document.getElementById("as-hotline"); if (asHotline) asHotline.value = s.hotline || "";
     var asZalo = document.getElementById("as-zalo"); if (asZalo) asZalo.value = s.zalo || "";
@@ -324,21 +361,6 @@
     var asHTitle = document.getElementById("as-hero-title"); if (asHTitle) asHTitle.value = s.heroTitle || "";
     var asHDesc = document.getElementById("as-hero-desc"); if (asHDesc) asHDesc.value = s.heroDesc || "";
     var asHImg = document.getElementById("as-hero-image"); if (asHImg) asHImg.value = s.heroImage || "";
-
-    var cleanHotline = (s.hotline || "0934338765").replace(/\s+/g, "");
-    var cleanZalo = (s.zalo || "0934338765").replace(/\s+/g, "");
-
-    var floatCall = document.getElementById("float-call-btn");
-    if (floatCall) {
-      floatCall.href = "tel:" + cleanHotline;
-      var callSpan = floatCall.querySelector("span");
-      if (callSpan) callSpan.textContent = "Hotline: " + (s.hotline || "0934338765");
-    }
-
-    var floatZalo = document.getElementById("float-zalo-btn");
-    if (floatZalo) {
-      floatZalo.href = "https://zalo.me/" + cleanZalo;
-    }
   }
 
   // Render Product Catalog
