@@ -1,15 +1,15 @@
 /* ==========================================================================
-   LETHOCCELLPHONE'S - HIGH-SPEED KVDB REALTIME CLOUD SYNC ENGINE (v65.0.0)
+   LETHOCCELLPHONE'S - HIGH-SPEED FIREBASE REALTIME CLOUD SYNC ENGINE (v70.0.0)
    ========================================================================== */
 
 (function() {
   'use strict';
 
-  var CURRENT_VERSION = "65.0.0";
+  var CURRENT_VERSION = "70.0.0";
   localStorage.setItem("lethoc_app_v", CURRENT_VERSION);
 
-  // Dynamic KVDB endpoint (Zero CORS restrictions, free public read/write)
-  var CLOUD_DB_URL = "https://kvdb.io/7xW8s9Y2zQ1kP3mL5aN9bC/lethoc_cellphone_store_v65";
+  // Global Firebase RTDB REST Endpoint (100% free, open CORS, no rate limits, instant write/read)
+  var CLOUD_DB_URL = "https://lethoccellphone-default-rtdb.asia-southeast1.firebasedatabase.app/store.json";
 
   // SVG Fallback Data URI
   var SVG_FALLBACK = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230e131f'/%3E%3Cpath d='M160 90h80a20 20 0 0 1 20 20v100a20 20 0 0 1-20 20h-80a20 20 0 0 1-20-20V110a20 20 0 0 1 20-20z' fill='none' stroke='%2306b6d4' stroke-width='4'/%3E%3Ccircle cx='200' cy='210' r='6' fill='%2306b6d4'/%3E%3Crect x='180' y='102' width='40' height='4' rx='2' fill='%2306b6d4'/%3E%3Ctext x='200' y='250' font-family='sans-serif' font-size='14' font-weight='bold' fill='%2394a3b8' text-anchor='middle'%3ELETHOCCELLPHONE'S%3C/text%3E%3C/svg%3E";
@@ -164,7 +164,7 @@
     renderCart();
   }
 
-  // PUSH TO CLOUD DATABASE (KVDB API)
+  // PUSH TO CLOUD DATABASE (Firebase REST API using PUT)
   function pushToCloudDB() {
     var payload = {
       products: state.products,
@@ -174,21 +174,25 @@
     };
 
     fetch(CLOUD_DB_URL, {
-      method: "POST",
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     }).then(function(res) {
-      if (res.ok) updateCloudBadge(true);
+      if (res.ok) {
+        updateCloudBadge(true);
+      } else {
+        updateCloudBadge(false);
+      }
     }).catch(function() {
       updateCloudBadge(false);
     });
   }
 
-  // FETCH FROM CLOUD DATABASE (KVDB API)
+  // FETCH FROM CLOUD DATABASE (Firebase REST API)
   function syncFromCloudDB() {
     fetch(CLOUD_DB_URL)
       .then(function(res) {
-        if (!res.ok) throw new Error("Cloud empty");
+        if (!res.ok) throw new Error("Cloud fetch failed");
         return res.json();
       })
       .then(function(data) {
@@ -205,13 +209,13 @@
 
           renderAll();
           updateCloudBadge(true);
+        } else {
+          // If database is empty, initialize it with local/default data
+          pushToCloudDB();
         }
       })
       .catch(function() {
-        // If first run or offline, push default data to initialize cloud store
-        if (state.products.length > 0) {
-          pushToCloudDB();
-        }
+        updateCloudBadge(false);
       });
   }
 
@@ -799,7 +803,7 @@
     renderSpecsChips();
 
     window.closeAdminModalNow();
-    alert("🎉 CHÚC MỪNG! Đã đăng sản phẩm '" + title + "' thành công lên Cloud Database!");
+    alert("🎉 CHÚC MỪNG! Đã đăng sản phẩm '" + title + "' thành công lên Đám mây!");
     return false;
   };
 
