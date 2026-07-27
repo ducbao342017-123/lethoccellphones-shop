@@ -1,15 +1,18 @@
 /* ==========================================================================
-   LETHOCCELLPHONE'S - HIGH-SPEED KVDB REALTIME CLOUD SYNC ENGINE (v75.0.0)
+   LETHOCCELLPHONE'S - GITHUB GIST REALTIME CLOUD SYNC ENGINE (v76.0.0)
    ========================================================================== */
 
 (function() {
   'use strict';
 
-  var CURRENT_VERSION = "75.0.0";
+  var CURRENT_VERSION = "76.0.0";
   localStorage.setItem("lethoc_app_v", CURRENT_VERSION);
 
-  // Dynamic KVDB endpoint linked to user's email legiang262@gmail.com
-  var CLOUD_DB_URL = "https://kvdb.io/BXbvnMCmVhpdkzGxGBCgrB/lethoc_store";
+  // GitHub Gist as cloud database - linked to ducbao342017-123's account
+  var GIST_ID = "bcc24d3db60536cda7fada08f79b28e7";
+  var GIST_TOKEN = "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";
+  var GIST_API_URL = "https://api.github.com/gists/" + GIST_ID;
+  var GIST_RAW_BASE = "https://gist.githubusercontent.com/ducbao342017-123/" + GIST_ID + "/raw/lethoc_store.json";
 
   // SVG Fallback Data URI
   var SVG_FALLBACK = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230e131f'/%3E%3Cpath d='M160 90h80a20 20 0 0 1 20 20v100a20 20 0 0 1-20 20h-80a20 20 0 0 1-20-20V110a20 20 0 0 1 20-20z' fill='none' stroke='%2306b6d4' stroke-width='4'/%3E%3Ccircle cx='200' cy='210' r='6' fill='%2306b6d4'/%3E%3Crect x='180' y='102' width='40' height='4' rx='2' fill='%2306b6d4'/%3E%3Ctext x='200' y='250' font-family='sans-serif' font-size='14' font-weight='bold' fill='%2394a3b8' text-anchor='middle'%3ELETHOCCELLPHONE'S%3C/text%3E%3C/svg%3E";
@@ -157,7 +160,7 @@
     pushToCloudDB();
   }
 
-  // PUSH TO CLOUD DATABASE (KVDB API)
+  // PUSH TO CLOUD DATABASE (GitHub Gist PATCH)
   function pushToCloudDB() {
     var payload = {
       products: state.products,
@@ -166,10 +169,22 @@
       timestamp: Date.now()
     };
 
-    fetch(CLOUD_DB_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    var body = JSON.stringify({
+      files: {
+        "lethoc_store.json": {
+          content: JSON.stringify(payload)
+        }
+      }
+    });
+
+    fetch(GIST_API_URL, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "token " + GIST_TOKEN,
+        "Accept": "application/vnd.github.v3+json"
+      },
+      body: body
     }).then(function(res) {
       if (res.ok) {
         updateCloudBadge(true);
@@ -181,9 +196,10 @@
     });
   }
 
-  // FETCH FROM CLOUD DATABASE (KVDB API)
+  // FETCH FROM CLOUD DATABASE (GitHub Gist raw - with cache buster)
   function syncFromCloudDB() {
-    fetch(CLOUD_DB_URL)
+    var rawUrl = GIST_RAW_BASE + "?t=" + Date.now();
+    fetch(rawUrl, { cache: "no-store" })
       .then(function(res) {
         if (!res.ok) throw new Error("Cloud fetch failed");
         return res.json();
