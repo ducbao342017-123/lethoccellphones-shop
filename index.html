@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>LETHOCCELLPHONE'S | Hệ Thống Điện Thoại & Hitech Uy Tín</title>
+  
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts with Full Vietnamese Subset -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap&subset=vietnamese" rel="stylesheet">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css?v=57.0.0">
+</head>
+<body>
+
+  <!-- ==================== HEADER NAVBAR ==================== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#" class="logo-brand" id="header-logo">LETHOCCELLPHONE'S<span>.</span></a>
+      
+      <ul class="nav-menu">
+        <li><a href="#" class="nav-link active">Trang Chủ</a></li>
+        <li><a href="#products" class="nav-link">Sản Phẩm</a></li>
+        <li><a href="#credibility" class="nav-link">Uy Tín</a></li>
+        <li><a href="#testimonials" class="nav-link">Đánh Giá</a></li>
+      </ul>
+
+      <div class="header-actions">
+        <span id="cloud-sync-badge" class="header-status-badge">🟢 Đã Đồng Bộ Cloud</span>
+        <button type="button" onclick="toggleCartDrawerDirectly()" class="btn btn-secondary" id="cart-btn">
+          <i class="fa-solid fa-cart-shopping"></i> 🛒 Giỏ Hàng <span class="cart-badge" id="cart-count-badge">0</span>
+        </button>
+        <button type="button" onclick="openAdminModalNow()" class="btn btn-secondary">
+          <i class="fa-solid fa-gear"></i> ⚙️ Quản Trị
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== HERO BANNER SHOWCASE ==================== -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-box">
+        <div class="hero-header">
+          <div class="hero-tabs">
+            <button type="button" onclick="switchHeroTabDirectly('new')" data-tab="new" class="hero-tab-btn active">📦 Hàng Mới Về</button>
+            <button type="button" onclick="switchHeroTabDirectly('coming')" data-tab="coming" class="hero-tab-btn">⏳ Hàng Sắp Có</button>
+            <button type="button" onclick="switchHeroTabDirectly('featured')" data-tab="featured" class="hero-tab-btn">🌟 Nổi Bật</button>
+            <button type="button" onclick="switchHeroTabDirectly('hot')" data-tab="hot" class="hero-tab-btn">🔥 Hot</button>
+          </div>
+          <div style="display: flex; gap: 0.3rem; align-items: center;">
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-right: 0.3rem;">Co giãn khung:</span>
+            <button type="button" onclick="setBannerWidthDirectly('50%')" class="hero-tab-btn" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">50%</button>
+            <button type="button" onclick="setBannerWidthDirectly('65%')" class="hero-tab-btn" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">65%</button>
+            <button type="button" onclick="setBannerWidthDirectly('100%')" class="hero-tab-btn" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">100%</button>
+          </div>
+        </div>
+
+        <div class="hero-slide">
+          <div>
+            <div class="hero-badge"><i class="fa-solid fa-bolt"></i> <span id="hero-tag-text">⚡ Trải nghiệm Không gian Công nghệ Hiện đại</span></div>
+            <h1 class="hero-title" id="hero-title-text">Nơi trải nghiệm Công nghệ<br><span>Mua sắm và Tận hưởng</span></h1>
+            <p class="hero-desc" id="hero-desc-text">Khám phá không gian công nghệ đỉnh cao và trải nghiệm mua sắm thoải mái với dịch vụ chăm sóc chu đáo.</p>
+            <div style="display: flex; gap: 0.8rem;">
+              <a href="#products" class="btn btn-primary"><i class="fa-solid fa-bag-shopping"></i> Khám Phá Ngay</a>
+              <button type="button" onclick="openAdminModalNow()" class="btn btn-secondary"><i class="fa-solid fa-plus"></i> Đăng Bài Mới</button>
+            </div>
+          </div>
+          <div class="hero-img-container">
+            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80" alt="Hero Product" id="hero-slide-img" class="hero-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%230e131f\'/%3E%3Cpath d=\'M160 90h80a20 20 0 0 1 20 20v100a20 20 0 0 1-20 20h-80a20 20 0 0 1-20-20V110a20 20 0 0 1 20-20z\' fill=\'none\' stroke=\'%2306b6d4\' stroke-width=\'4\'/%3E%3Ccircle cx=\'200\' cy=\'210\' r=\'6\' fill=\'%2306b6d4\'/%3E%3Crect x=\'180\' y=\'102\' width=\'40\' height=\'4\' rx=\'2\' fill=\'%2306b6d4\'/%3E%3Ctext x=\'200\' y=\'250\' font-family=\'sans-serif\' font-size=\'14\' font-weight=\'bold\' fill=\'%2394a3b8\' text-anchor=\'middle\'%3ELETHOCCELLPHONE\'S%3C/text%3E%3C/svg%3E'">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CREDIBILITY BADGES ==================== -->
+  <section class="cred-section" id="credibility">
+    <div class="container">
+      <div class="cred-grid">
+        <div class="cred-card">
+          <div class="cred-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <div>
+            <h3 class="cred-title" id="cred-title-1">100% Chính Hãng</h3>
+            <p class="cred-desc" id="cred-desc-1">Cam kết hoàn tiền gấp 10 lần nếu phát hiện hàng nhái.</p>
+          </div>
+        </div>
+        <div class="cred-card">
+          <div class="cred-icon"><i class="fa-solid fa-rotate-left"></i></div>
+          <div>
+            <h3 class="cred-title" id="cred-title-2">Bảo Hành 24 Tháng</h3>
+            <p class="cred-desc" id="cred-desc-2">Chính sách 1-đổi-1 hoàn toàn mới trong 30 ngày đầu.</p>
+          </div>
+        </div>
+        <div class="cred-card">
+          <div class="cred-icon"><i class="fa-solid fa-truck-fast"></i></div>
+          <div>
+            <h3 class="cred-title" id="cred-title-3">Giao Hỏa Tốc 2H</h3>
+            <p class="cred-desc" id="cred-desc-3">Nhận hàng tận tay siêu tốc nội thành Hà Nội & TP.HCM.</p>
+          </div>
+        </div>
+        <div class="cred-card">
+          <div class="cred-icon"><i class="fa-solid fa-headset"></i></div>
+          <div>
+            <h3 class="cred-title" id="cred-title-4">Hỗ Trợ 24/7</h3>
+            <p class="cred-desc" id="cred-desc-4">Đội ngũ kỹ thuật viên tư vấn tận tâm mọi lúc mọi nơi.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRODUCT CATALOG ==================== -->
+  <section class="catalog-section" id="products">
+    <div class="container">
+      <div class="section-top">
+        <div>
+          <span style="color: var(--accent-cyan); font-weight: 700; font-size: 0.85rem; text-transform: uppercase;">DANH MỤC SẢN PHẨM</span>
+          <h2 class="sec-title">Thiết Bị Công Nghệ Hitech</h2>
+        </div>
+
+        <div class="filter-bar">
+          <button type="button" onclick="filterCategoryDirectly('all')" data-filter="all" class="filter-btn active">🌐 Tất Cả</button>
+          <button type="button" onclick="filterCategoryDirectly('mobile')" data-filter="mobile" class="filter-btn">📱 Điện Thoại</button>
+          <button type="button" onclick="filterCategoryDirectly('overear')" data-filter="overear" class="filter-btn">🎧 Tai Nghe Over-Ear</button>
+          <button type="button" onclick="filterCategoryDirectly('earbuds')" data-filter="earbuds" class="filter-btn">🎵 Earbuds</button>
+          <button type="button" onclick="filterCategoryDirectly('speaker')" data-filter="speaker" class="filter-btn">🔊 Loa Bluetooth</button>
+        </div>
+      </div>
+
+      <div class="products-grid" id="products-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TESTIMONIALS SECTION ==================== -->
+  <section class="testimonials-section" id="testimonials">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 2.5rem;">
+        <span style="color: var(--accent-cyan); font-weight: 700; font-size: 0.85rem; text-transform: uppercase;">Đánh Giá Từ Khách Hàng</span>
+        <h2 class="sec-title">Nhận Xét Thực Tế</h2>
+      </div>
+
+      <div class="test-grid" id="testimonials-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="#" class="logo-brand">LETHOCCELLPHONE'S<span>.</span></a>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.75rem;">Hệ thống phân phối và niêm yết thiết bị âm thanh HITECH & điện thoại cao cấp hàng đầu Việt Nam.</p>
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem;">Liên Hệ Support</h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem;" id="footer-hotline">📞 Hotline: 0934338765</p>
+          <p style="color: var(--text-muted); font-size: 0.85rem;" id="footer-address">📍 Địa chỉ: TP. Hồ Chí Minh</p>
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem;">Bảo Hành & Đổi Trả</h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Chính sách bảo hành 24 tháng 1-đổi-1 cho mọi sản phẩm lỗi từ nhà sản xuất.</p>
+        </div>
+      </div>
+      <div class="footer-copy">
+        © 2026 LETHOCCELLPHONE'S. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== FLOATING CONTACT ACTION BUTTONS (MATCHING SCREENSHOT) ==================== -->
+  <div class="floating-actions">
+    <a href="tel:0934338765" id="float-call-btn" class="float-btn float-phone" title="Gọi Hotline hỗ trợ">
+      <i class="fa-solid fa-phone"></i> <span>Hotline: 0934338765</span>
+    </a>
+    <a href="https://zalo.me/0934338765" id="float-zalo-btn" target="_blank" class="float-btn float-zalo" title="Chat Zalo tư vấn">
+      <i class="fa-solid fa-comment-dots"></i> <span>Chat Zalo 24/7</span>
+    </a>
+  </div>
+
+  <!-- ==================== SHOPPING CART DRAWER ==================== -->
+  <div class="cart-drawer-overlay" id="cart-drawer-overlay">
+    <div class="cart-drawer">
+      <div class="cart-header">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--accent-cyan);">🛒 Giỏ Hàng Của Bạn</h3>
+        <button type="button" onclick="toggleCartDrawerDirectly()" class="modal-close">×</button>
+      </div>
+
+      <div class="cart-items-list" id="cart-items-list">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="cart-footer">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <span style="color: var(--text-muted); font-size: 0.9rem;">Tổng thanh toán:</span>
+          <span id="cart-total-price" style="font-size: 1.25rem; font-weight: 800; color: var(--accent-cyan);">0 ₫</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" onclick="clearCartDirectly()" class="btn btn-secondary" style="padding: 0.75rem 1rem; font-size: 0.85rem; color: #f87171; border-color: #f87171;">Xóa Hết</button>
+          <button type="button" onclick="openCheckoutDirectly()" class="btn btn-primary" style="flex: 1; padding: 0.75rem; font-size: 0.9rem;">Tiến Hành Đặt Hàng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CHECKOUT FORM MODAL ==================== -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-box" style="max-width: 550px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🚚 Thông Tin Đặt Hàng & Giao Hàng</h2>
+        <button type="button" onclick="closeCheckoutModalDirectly()" class="modal-close">×</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="checkout-form" onsubmit="return submitCheckoutFormDirectly(event)">
+          <div class="form-group">
+            <label class="form-label">Họ và Tên Khách Hàng (*)</label>
+            <input type="text" id="co-name" class="form-input" placeholder="Ví dụ: Nguyễn Văn A" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số Điện Thoại (*)</label>
+            <input type="tel" id="co-phone" class="form-input" placeholder="Ví dụ: 0934338765" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Địa Chỉ Nhận Hàng (*)</label>
+            <input type="text" id="co-address" class="form-input" placeholder="Số nhà, tên đường, quận/huyện, thành phố..." required>
+          </div>
+
+          <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--border-glass); padding-top: 1rem;">
+            <button type="button" onclick="closeCheckoutModalDirectly()" class="btn btn-secondary">Hủy bỏ</button>
+            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">XÁC NHẬN ĐẶT HÀNG</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN MODAL ==================== -->
+  <div class="modal-overlay" id="admin-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title">⚙️ Bảng Quản Trị Cửa Hàng</h2>
+        <button type="button" onclick="closeAdminModalNow()" class="modal-close">×</button>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; padding: 1rem 1.5rem 0; border-bottom: 1px solid var(--border-glass); flex-wrap: wrap;">
+        <button type="button" id="tab-btn-list" onclick="switchAdminTabDirectly('list')" class="btn btn-secondary active" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Danh Sách Sản Phẩm</button>
+        <button type="button" id="tab-btn-form" onclick="switchAdminTabDirectly('form')" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Thêm Sản Phẩm Mới</button>
+        <button type="button" id="tab-btn-settings" onclick="switchAdminTabDirectly('settings')" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Cài Đặt Cửa Hàng</button>
+        <button type="button" id="tab-btn-testimonials" onclick="switchAdminTabDirectly('testimonials')" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Nhận Xét Khách Hàng</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tab 1: Product List Table -->
+        <div id="tab-content-list" style="display: block;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+            <button type="button" onclick="switchAdminTabDirectly('form')" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;"><i class="fa-solid fa-plus"></i> Thêm Sản Phẩm Mới</button>
+          </div>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                  <th style="padding: 0.75rem;">Ảnh</th>
+                  <th style="padding: 0.75rem;">Tên Sản Phẩm</th>
+                  <th style="padding: 0.75rem;">Danh Mục</th>
+                  <th style="padding: 0.75rem;">Đơn Giá</th>
+                  <th style="padding: 0.75rem; text-align: center;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 2: Add Product Form -->
+        <div id="tab-content-form" style="display: none;">
+          <form id="admin-product-form" onsubmit="return saveProductFormDirectly(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div>
+                <div class="form-group">
+                  <label class="form-label">Tên Sản Phẩm (*)</label>
+                  <input type="text" id="ap-title" class="form-input" placeholder="Ví dụ: Note20U5G" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Danh Mục Sản Phẩm</label>
+                  <select id="ap-category" class="form-input" style="background: var(--bg-dark);">
+                    <option value="mobile">Điện Thoại Di Động</option>
+                    <option value="overear">Tai nghe Over-Ear</option>
+                    <option value="earbuds">Tai nghe Earbuds</option>
+                    <option value="speaker">Loa Bluetooth</option>
+                    <option value="drone">Drone - Flycam</option>
+                    <option value="camera">Máy Ảnh</option>
+                    <option value="accessory">Phụ Kiện</option>
+                    <option value="appliance">Gia Dụng</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Giá Bán (VNĐ) (*)</label>
+                  <input type="number" id="ap-price" class="form-input" placeholder="Ví dụ: 6500000" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nhãn Hiển Thị (Badge)</label>
+                  <select id="ap-badge" class="form-input" style="background: var(--bg-dark);">
+                    <option value="Mới về">Mới về</option>
+                    <option value="Bán chạy">Bán chạy</option>
+                    <option value="Hot">Hot</option>
+                    <option value="Sắp Có">Sắp Có</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div class="form-group">
+                  <label class="form-label">Mô Tả Ngắn Sản Phẩm</label>
+                  <textarea id="ap-desc" class="form-input" placeholder="Ví dụ: Likenew..." style="height: 80px; resize: none;"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Đường Dẫn Ảnh Hoặc Đăng File Từ Máy/Camera</label>
+                  <input type="text" id="ap-image" class="form-input" placeholder="Nhập link ảnh hoặc bấm nút bên dưới...">
+                  <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                    <button type="button" onclick="triggerImageFilePickerDirectly()" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;">
+                      📱 TẢI ẢNH TỪ THIẾT BỊ
+                    </button>
+                    <button type="button" onclick="triggerCameraCaptureDirectly()" class="btn btn-emerald" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;">
+                      📸 CHỤP ẢNH TỪ CAMERA
+                    </button>
+                    <input type="file" id="ap-image-file" onchange="handleImageFileUploadDirectly(this)" accept="image/*" style="display: none;">
+                    <input type="file" id="ap-image-camera" onchange="handleImageFileUploadDirectly(this)" accept="image/*" capture="environment" style="display: none;">
+                  </div>
+                  <div id="ap-image-preview-container" style="display: none; margin-top: 0.5rem;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Thông Số Kỹ Thuật (Specs List)</label>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="ap-spec-input" class="form-input" placeholder="Nhập thông số rồi bấm Thêm...">
+                    <button type="button" onclick="addSpecDirectly()" class="btn btn-secondary" style="padding: 0 1rem;">Thêm</button>
+                  </div>
+                  <div id="form-specs-list" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; min-height: 35px;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--border-glass); padding-top: 1rem;">
+              <button type="button" onclick="closeAdminModalNow()" class="btn btn-secondary">Hủy bỏ</button>
+              <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">LƯU SẢN PHẨM</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tab 3: Store Settings Form & Credibility Banner -->
+        <div id="tab-content-settings" style="display: none;">
+          <form id="admin-settings-form" onsubmit="return saveStoreSettingsDirectly(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div>
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.8rem; color: var(--accent-cyan);">Thông Tin Liên Hệ, Mật Khẩu & Địa Chỉ</h4>
+                <div class="form-group">
+                  <label class="form-label">Tên Cửa Hàng / Thương Hiệu</label>
+                  <input type="text" id="as-storename" class="form-input" placeholder="LETHOCCELLPHONE'S">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Số Hotline Liên Hệ</label>
+                  <input type="text" id="as-hotline" class="form-input" placeholder="0934338765">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Số Zalo Hỗ Trợ</label>
+                  <input type="text" id="as-zalo" class="form-input" placeholder="0934338765">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">🔐 Mật Khẩu Quản Trị (Mặc định: admin)</label>
+                  <input type="text" id="as-password" class="form-input" placeholder="admin">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Địa Chỉ Cửa Hàng</label>
+                  <input type="text" id="as-address" class="form-input" placeholder="TP. Hồ Chí Minh">
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 1rem 0;">
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.8rem; color: var(--accent-cyan);">Cấu Hình 4 Thẻ Uy Tín Cửa Hàng</h4>
+                
+                <div class="form-group">
+                  <label class="form-label">Hiển Thị Banner Uy Tín Trên Trang Chủ</label>
+                  <select id="as-cred-visible" class="form-input" style="background: var(--bg-dark);">
+                    <option value="show">Hiện Banner Uy Tín</option>
+                    <option value="hide">Ẩn Banner Uy Tín</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Thẻ 1: Tiêu đề & Mô tả</label>
+                  <input type="text" id="as-cred-title-1" class="form-input" placeholder="100% Chính Hãng" style="margin-bottom: 0.3rem;">
+                  <input type="text" id="as-cred-desc-1" class="form-input" placeholder="Cam kết hoàn tiền gấp 10 lần...">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Thẻ 2: Tiêu đề & Mô tả</label>
+                  <input type="text" id="as-cred-title-2" class="form-input" placeholder="Bảo Hành 12 Tháng" style="margin-bottom: 0.3rem;">
+                  <input type="text" id="as-cred-desc-2" class="form-input" placeholder="Chính sách bảo hành 12 tháng...">
+                </div>
+              </div>
+
+              <div>
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.8rem; color: var(--accent-cyan);">Cấu Hình Thẻ Uy Tín Tiếp & Banner chính</h4>
+                <div class="form-group">
+                  <label class="form-label">Thẻ 3: Tiêu đề & Mô tả</label>
+                  <input type="text" id="as-cred-title-3" class="form-input" placeholder="Giao hàng toàn quốc" style="margin-bottom: 0.3rem;">
+                  <input type="text" id="as-cred-desc-3" class="form-input" placeholder="Giao hàng toàn quốc qua các hệ thống...">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Thẻ 4: Tiêu đề & Mô tả</label>
+                  <input type="text" id="as-cred-title-4" class="form-input" placeholder="Hỗ Trợ Kỹ Thuật 24/7" style="margin-bottom: 0.3rem;">
+                  <input type="text" id="as-cred-desc-4" class="form-input" placeholder="Đội ngũ kỹ thuật tư vấn...">
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 1rem 0;">
+                <div class="form-group">
+                  <label class="form-label">Dòng Chữ Nhỏ Tagline Banner</label>
+                  <input type="text" id="as-hero-tag" class="form-input" placeholder="⚡ Trải nghiệm Không gian Công nghệ Hiện đại">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tiêu Đề Banner (Chấp nhận &lt;br&gt; &lt;span&gt;)</label>
+                  <input type="text" id="as-hero-title" class="form-input" placeholder="Nơi trải nghiệm Công nghệ&lt;br&gt;&lt;span&gt;Mua sắm và Tận hưởng&lt;/span&gt;">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Mô Tả Banner</label>
+                  <textarea id="as-hero-desc" class="form-input" style="height: 50px; resize: none;"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Ảnh Banner Chính</label>
+                  <input type="text" id="as-hero-image" class="form-input" placeholder="Nhập link ảnh hoặc chọn file...">
+                  <div style="display: flex; gap: 0.5rem; margin-top: 0.4rem; flex-wrap: wrap;">
+                    <button type="button" onclick="triggerHeroImageFilePickerDirectly()" class="btn btn-primary" style="padding: 0.35rem 0.7rem; font-size: 0.75rem;">📱 TẢI ẢNH MÁY</button>
+                    <button type="button" onclick="triggerHeroCameraCaptureDirectly()" class="btn btn-emerald" style="padding: 0.35rem 0.7rem; font-size: 0.75rem;">📸 CHỤP CAMERA</button>
+                    <input type="file" id="as-hero-image-file" onchange="handleHeroImageFileUploadDirectly(this)" accept="image/*" style="display: none;">
+                    <input type="file" id="as-hero-image-camera" onchange="handleHeroImageFileUploadDirectly(this)" accept="image/*" capture="environment" style="display: none;">
+                  </div>
+                  <div id="as-hero-image-preview-container" style="display: none; margin-top: 0.4rem;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--border-glass); padding-top: 1rem;">
+              <button type="button" onclick="closeAdminModalNow()" class="btn btn-secondary">Hủy bỏ</button>
+              <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">LƯU CẤU HÌNH CỬA HÀNG</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tab 4: Customer Testimonials Management -->
+        <div id="tab-content-testimonials" style="display: none;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: center;">
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Quản lý và đăng thêm các nhận xét từ khách hàng hiển thị trên website.</span>
+            <button type="button" onclick="toggleTestimonialFormDirectly()" class="btn btn-primary" style="padding: 0.45rem 0.9rem; font-size: 0.8rem;">➕ Thêm Nhận Xét Mới</button>
+          </div>
+
+          <!-- Add Testimonial Form (Ẩn mặc định) -->
+          <div id="testimonial-form-wrapper" style="display: none; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+            <form id="admin-testimonial-form" onsubmit="return saveTestimonialFormDirectly(event)">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label">Họ và Tên Khách Hàng (*)</label>
+                  <input type="text" id="at-name" class="form-input" placeholder="Ví dụ: Trần Minh Hoàng" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Chức Danh / Thành Phố</label>
+                  <input type="text" id="at-role" class="form-input" placeholder="Ví dụ: Khách mua Note20U5G, Hà Nội">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Số Sao Đánh Giá (1 - 5 Sao)</label>
+                <select id="at-rating" class="form-input" style="background: var(--bg-dark);">
+                  <option value="5">⭐⭐⭐⭐⭐ (5 Sao)</option>
+                  <option value="4">⭐⭐⭐⭐ (4 Sao)</option>
+                  <option value="3">⭐⭐⭐ (3 Sao)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nội Dung Nhận Xét Thực Tế (*)</label>
+                <textarea id="at-text" class="form-input" placeholder="Nhập cảm nhận của khách hàng..." style="height: 65px; resize: none;" required></textarea>
+              </div>
+              <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                <button type="button" onclick="toggleTestimonialFormDirectly()" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Hủy</button>
+                <button type="submit" class="btn btn-primary" style="padding: 0.4rem 1.2rem; font-size: 0.8rem;">LƯU NHẬN XÉT</button>
+              </div>
+            </form>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--border-glass);">
+                  <th style="padding: 0.75rem;">Tên Khách Hàng</th>
+                  <th style="padding: 0.75rem;">Chức Danh / Nơi Ở</th>
+                  <th style="padding: 0.75rem;">Đánh Giá</th>
+                  <th style="padding: 0.75rem;">Nội Dung Nhận Xét</th>
+                  <th style="padding: 0.75rem; text-align: center;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="admin-testimonials-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Logic Script -->
+  <script src="app.js?v=57.0.0"></script>
+</body>
+</html>
