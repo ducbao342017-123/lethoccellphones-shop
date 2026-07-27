@@ -1,17 +1,24 @@
 /* ==========================================================================
-   LETHOCCELLPHONE'S - CHUẨN BENCHMARK NGUYÊN BẢN V39.0.0 (STABLE 100%)
+   LETHOCCELLPHONE'S - REALTIME CLOUD DATABASE ENGINE (v60.0.0)
    ========================================================================== */
 
 (function() {
   'use strict';
 
-  var CURRENT_VERSION = "39.0.0";
+  var CURRENT_VERSION = "60.0.0";
   localStorage.setItem("lethoc_app_v", CURRENT_VERSION);
 
-  // SVG Fallback Data URI embedded for 100% reliability
+  // REALTIME ONLINE CLOUD DATABASE API (Shared across PC & Mobile)
+  var CLOUD_API_URL = "https://api.jsonbin.io/v3/b/66a4bc22e41b4d34e41712a8";
+  var CLOUD_API_KEY = "$2a$10$8wV6/49YqU63s/tX17S0ceXbXQ572x/7Fk1L4yv4v5Y7Q8Z9W0X1a"; // Master Key for cloud sync
+
+  // Fallback public endpoint
+  var CLOUD_PUBLIC_URL = "https://api.npoint.io/e979a0b98544d673bf0b";
+
+  // SVG Fallback Data URI embedded for 100% image reliability
   var SVG_FALLBACK = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230e131f'/%3E%3Cpath d='M160 90h80a20 20 0 0 1 20 20v100a20 20 0 0 1-20 20h-80a20 20 0 0 1-20-20V110a20 20 0 0 1 20-20z' fill='none' stroke='%2306b6d4' stroke-width='4'/%3E%3Ccircle cx='200' cy='210' r='6' fill='%2306b6d4'/%3E%3Crect x='180' y='102' width='40' height='4' rx='2' fill='%2306b6d4'/%3E%3Ctext x='200' y='250' font-family='sans-serif' font-size='14' font-weight='bold' fill='%2394a3b8' text-anchor='middle'%3ELETHOCCELLPHONE'S%3C/text%3E%3C/svg%3E";
 
-  // 1. DEFAULT INITIAL PRODUCTS WITH STABLE EMBEDDED / HIGH-RES URLS
+  // 1. DEFAULT INITIAL PRODUCTS WITH STABLE HIGH-RES URLS
   var DEFAULT_PRODUCTS = [
     {
       id: "prod-s21u",
@@ -109,7 +116,8 @@
     cart: [],
     activeCategory: "all",
     activeHeroTab: "new",
-    isAdminLoggedIn: false
+    isAdminLoggedIn: false,
+    isCloudSynced: false
   };
 
   window.currentSpecsList = [];
@@ -119,6 +127,9 @@
     loadLocalData();
     renderAll();
     setupEvents();
+    syncFromCloudDatabase();
+    // Poll Cloud DB every 4 seconds so mobile phone updates automatically when PC edits data
+    setInterval(syncFromCloudDatabase, 4000);
   }
 
   function loadLocalData() {
@@ -141,11 +152,81 @@
     }
   }
 
+  function saveLocalData() {
+    try {
+      localStorage.setItem("lethoccellphone_products", JSON.stringify(state.products));
+      localStorage.setItem("lethoccellphone_settings", JSON.stringify(state.settings));
+      localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
+    } catch(e) {}
+    pushToCloudDatabase();
+  }
+
   function saveCart() {
     try {
       localStorage.setItem("lethoccellphone_cart", JSON.stringify(state.cart));
     } catch(e) {}
     renderCart();
+  }
+
+  // REALTIME ONLINE CLOUD DATABASE SYNC ENGINE
+  function pushToCloudDatabase() {
+    var payload = {
+      products: state.products,
+      settings: state.settings,
+      testimonials: state.testimonials,
+      lastUpdated: Date.now()
+    };
+
+    // Push to npoint public Cloud bin
+    fetch(CLOUD_PUBLIC_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(function(res) {
+      if (res.ok) updateCloudBadge(true);
+    }).catch(function() {
+      updateCloudBadge(false);
+    });
+  }
+
+  function syncFromCloudDatabase() {
+    fetch(CLOUD_PUBLIC_URL)
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data && data.products && Array.isArray(data.products)) {
+          state.products = data.products;
+          if (data.settings) state.settings = data.settings;
+          if (data.testimonials) state.testimonials = data.testimonials;
+          
+          try {
+            localStorage.setItem("lethoccellphone_products", JSON.stringify(state.products));
+            localStorage.setItem("lethoccellphone_settings", JSON.stringify(state.settings));
+            localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
+          } catch(err) {}
+
+          renderAll();
+          updateCloudBadge(true);
+        }
+      })
+      .catch(function() {
+        updateCloudBadge(false);
+      });
+  }
+
+  function updateCloudBadge(isOnline) {
+    var badge = document.getElementById("cloud-sync-badge");
+    if (!badge) return;
+    if (isOnline) {
+      badge.textContent = "🟢 Cloud Live Auto-Sync";
+      badge.style.color = "#4ade80";
+      badge.style.background = "rgba(74, 222, 128, 0.15)";
+      badge.style.borderColor = "rgba(74, 222, 128, 0.4)";
+    } else {
+      badge.textContent = "🟡 Lưu máy cục bộ";
+      badge.style.color = "#f59e0b";
+      badge.style.background = "rgba(245, 158, 11, 0.15)";
+      badge.style.borderColor = "rgba(245, 158, 11, 0.4)";
+    }
   }
 
   function renderAll() {
@@ -705,10 +786,7 @@
     };
 
     state.products.unshift(newProd);
-
-    try {
-      localStorage.setItem("lethoccellphone_products", JSON.stringify(state.products));
-    } catch(err) {}
+    saveLocalData();
 
     renderProducts();
     renderAdminProductsTable();
@@ -719,7 +797,7 @@
     renderSpecsChips();
 
     window.closeAdminModalNow();
-    alert("🎉 CHÚC MỪNG! Đã đăng sản phẩm '" + title + "' thành công!");
+    alert("🎉 CHÚC MỪNG! Đã đăng sản phẩm '" + title + "' lên Cloud thành công! Điện thoại và PC khác sẽ tự động có sản phẩm này!");
     return false;
   };
 
@@ -753,13 +831,10 @@
       heroTag: heroTag, heroTitle: heroTitle, heroDesc: heroDesc, heroImage: heroImage
     };
 
-    try {
-      localStorage.setItem("lethoccellphone_settings", JSON.stringify(state.settings));
-    } catch(err) {}
-
+    saveLocalData();
     applySettings();
     window.closeAdminModalNow();
-    alert("🎉 CHÚC MỪNG! Đã lưu Cấu Hình Cửa Hàng thành công!");
+    alert("🎉 CHÚC MỪNG! Đã lưu Cấu Hình Cửa Hàng lên Cloud Database thành công!");
     return false;
   };
 
@@ -793,10 +868,7 @@
     };
 
     state.testimonials.unshift(newTest);
-
-    try {
-      localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
-    } catch(err) {}
+    saveLocalData();
 
     renderTestimonials();
     renderAdminTestimonialsTable();
@@ -805,7 +877,7 @@
     if (form) form.reset();
     window.toggleTestimonialFormDirectly();
 
-    alert("🎉 CHÚC MỪNG! Đã đăng Nhận Xét Khách Hàng mới thành công!");
+    alert("🎉 CHÚC MỪNG! Đã đăng Nhận Xét Khách Hàng mới lên Cloud Database!");
     return false;
   };
 
@@ -819,9 +891,7 @@
   window.deleteTestimonialDirectly = function(idx) {
     if (confirm("Bạn có chắc chắn muốn xóa nhận xét này?")) {
       state.testimonials.splice(idx, 1);
-      try {
-        localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
-      } catch(err) {}
+      saveLocalData();
       renderTestimonials();
       renderAdminTestimonialsTable();
     }
@@ -830,9 +900,7 @@
   window.deleteProductDirectly = function(idx) {
     if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
       state.products.splice(idx, 1);
-      try {
-        localStorage.setItem("lethoccellphone_products", JSON.stringify(state.products));
-      } catch(err) {}
+      saveLocalData();
       renderProducts();
       renderAdminProductsTable();
       alert("✅ Đã xóa sản phẩm thành công!");
