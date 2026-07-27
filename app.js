@@ -1,18 +1,16 @@
 /* ==========================================================================
-   LETHOCCELLPHONE'S - GITHUB GIST REALTIME CLOUD SYNC ENGINE (v76.0.0)
+   LETHOCCELLPHONE'S - NETLIFY PROXY CLOUD SYNC ENGINE (v80.0.0)
+   Token bảo mật trong Netlify ENV - không bao giờ lộ ra code
    ========================================================================== */
 
 (function() {
   'use strict';
 
-  var CURRENT_VERSION = "76.0.0";
+  var CURRENT_VERSION = "80.0.0";
   localStorage.setItem("lethoc_app_v", CURRENT_VERSION);
 
-  // GitHub Gist as cloud database - linked to ducbao342017-123's account
-  var GIST_ID = "bcc24d3db60536cda7fada08f79b28e7";
-  var GIST_TOKEN = "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";
-  var GIST_API_URL = "https://api.github.com/gists/" + GIST_ID;
-  var GIST_RAW_BASE = "https://gist.githubusercontent.com/ducbao342017-123/" + GIST_ID + "/raw/lethoc_store.json";
+  // Netlify Function proxy - token ẩn trong server, không lộ ra client
+  var SYNC_URL = "/.netlify/functions/sync";
 
   // SVG Fallback Data URI
   var SVG_FALLBACK = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230e131f'/%3E%3Cpath d='M160 90h80a20 20 0 0 1 20 20v100a20 20 0 0 1-20 20h-80a20 20 0 0 1-20-20V110a20 20 0 0 1 20-20z' fill='none' stroke='%2306b6d4' stroke-width='4'/%3E%3Ccircle cx='200' cy='210' r='6' fill='%2306b6d4'/%3E%3Crect x='180' y='102' width='40' height='4' rx='2' fill='%2306b6d4'/%3E%3Ctext x='200' y='250' font-family='sans-serif' font-size='14' font-weight='bold' fill='%2394a3b8' text-anchor='middle'%3ELETHOCCELLPHONE'S%3C/text%3E%3C/svg%3E";
@@ -161,71 +159,41 @@
     pushToCloudDB();
   }
 
-  // PUSH TO CLOUD DATABASE (GitHub Gist PATCH)
+  // PUSH TO CLOUD DATABASE (qua Netlify Function proxy)
   function pushToCloudDB() {
     var now = Date.now();
-    _lastPushTime = now;   // Lock: block sync overwrite for 20 seconds
+    _lastPushTime = now;   // Lock: chặn sync ghi đè 20 giây
 
-    var payload = {
+    var payload = JSON.stringify({
       products: state.products,
       settings: state.settings,
       testimonials: state.testimonials,
       timestamp: now
-    };
-
-    var body = JSON.stringify({
-      files: {
-        "lethoc_store.json": {
-          content: JSON.stringify(payload)
-        }
-      }
     });
 
-    fetch(GIST_API_URL, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "token " + GIST_TOKEN,
-        "Accept": "application/vnd.github.v3+json"
-      },
-      body: body
+    fetch(SYNC_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload
     }).then(function(res) {
-      if (res.ok) {
-        updateCloudBadge(true);
-      } else {
-        updateCloudBadge(false);
-      }
+      updateCloudBadge(res.ok);
     }).catch(function() {
       updateCloudBadge(false);
     });
   }
 
-  // FETCH FROM CLOUD DATABASE (GitHub Gist API - luôn mới, không bị cache CDN)
+  // FETCH FROM CLOUD DATABASE (qua Netlify Function proxy - không bị cache)
   function syncFromCloudDB() {
     // Nếu vừa push local data, chờ 20s trước khi để cloud ghi đè
     if (Date.now() - _lastPushTime < 20000) return;
 
-    fetch(GIST_API_URL, {
-      headers: {
-        "Authorization": "token " + GIST_TOKEN,
-        "Accept": "application/vnd.github.v3+json"
-      },
-      cache: "no-store"
-    })
+    fetch(SYNC_URL, { cache: "no-store" })
       .then(function(res) {
-        if (!res.ok) throw new Error("Cloud fetch failed");
+        if (!res.ok) throw new Error("Sync failed");
         return res.json();
       })
-      .then(function(gistData) {
-        // GitHub API trả về: gistData.files['lethoc_store.json'].content
-        var fileContent = gistData && gistData.files && gistData.files['lethoc_store.json']
-          ? gistData.files['lethoc_store.json'].content
-          : null;
-        var data = null;
-        try { data = fileContent ? JSON.parse(fileContent) : null; } catch(e) {}
-
+      .then(function(data) {
         if (data && data.products && Array.isArray(data.products)) {
-          // Chỉ ghi đè nếu dữ liệu cloud MỚI HƠN lần push local cuối
           var cloudTs = data.timestamp || 0;
           if (cloudTs >= _lastPushTime) {
             state.products = data.products;
@@ -238,11 +206,10 @@
               localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
             } catch(err) {}
 
-            renderAllSafe();  // Safe: KHÔNG reset form inputs đang gõ
+            renderAllSafe();
           }
           updateCloudBadge(true);
         } else {
-          // Lần đầu chạy hoặc dữ liệu rỗng, khởi tạo cloud bằng dữ liệu local
           pushToCloudDB();
         }
       })
