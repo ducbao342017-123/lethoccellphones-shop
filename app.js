@@ -200,20 +200,32 @@
     });
   }
 
-  // FETCH FROM CLOUD DATABASE (GitHub Gist raw - with cache buster)
+  // FETCH FROM CLOUD DATABASE (GitHub Gist API - luôn mới, không bị cache CDN)
   function syncFromCloudDB() {
-    // If we just pushed local data, wait 20s before allowing cloud to overwrite
+    // Nếu vừa push local data, chờ 20s trước khi để cloud ghi đè
     if (Date.now() - _lastPushTime < 20000) return;
 
-    var rawUrl = GIST_RAW_BASE + "?t=" + Date.now();
-    fetch(rawUrl, { cache: "no-store" })
+    fetch(GIST_API_URL, {
+      headers: {
+        "Authorization": "token " + GIST_TOKEN,
+        "Accept": "application/vnd.github.v3+json"
+      },
+      cache: "no-store"
+    })
       .then(function(res) {
         if (!res.ok) throw new Error("Cloud fetch failed");
         return res.json();
       })
-      .then(function(data) {
+      .then(function(gistData) {
+        // GitHub API trả về: gistData.files['lethoc_store.json'].content
+        var fileContent = gistData && gistData.files && gistData.files['lethoc_store.json']
+          ? gistData.files['lethoc_store.json'].content
+          : null;
+        var data = null;
+        try { data = fileContent ? JSON.parse(fileContent) : null; } catch(e) {}
+
         if (data && data.products && Array.isArray(data.products)) {
-          // Only overwrite local data if cloud data is NEWER than last local push
+          // Chỉ ghi đè nếu dữ liệu cloud MỚI HƠN lần push local cuối
           var cloudTs = data.timestamp || 0;
           if (cloudTs >= _lastPushTime) {
             state.products = data.products;
@@ -230,7 +242,7 @@
           }
           updateCloudBadge(true);
         } else {
-          // If first run or empty, initialize cloud with default data
+          // Lần đầu chạy hoặc dữ liệu rỗng, khởi tạo cloud bằng dữ liệu local
           pushToCloudDB();
         }
       })
