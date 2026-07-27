@@ -1,24 +1,20 @@
 /* ==========================================================================
-   LETHOCCELLPHONE'S - REALTIME CLOUD DATABASE ENGINE (v60.0.0)
+   LETHOCCELLPHONE'S - HIGH-SPEED KVDB REALTIME CLOUD SYNC ENGINE (v65.0.0)
    ========================================================================== */
 
 (function() {
   'use strict';
 
-  var CURRENT_VERSION = "60.0.0";
+  var CURRENT_VERSION = "65.0.0";
   localStorage.setItem("lethoc_app_v", CURRENT_VERSION);
 
-  // REALTIME ONLINE CLOUD DATABASE API (Shared across PC & Mobile)
-  var CLOUD_API_URL = "https://api.jsonbin.io/v3/b/66a4bc22e41b4d34e41712a8";
-  var CLOUD_API_KEY = "$2a$10$8wV6/49YqU63s/tX17S0ceXbXQ572x/7Fk1L4yv4v5Y7Q8Z9W0X1a"; // Master Key for cloud sync
+  // Dynamic KVDB endpoint (Zero CORS restrictions, free public read/write)
+  var CLOUD_DB_URL = "https://kvdb.io/7xW8s9Y2zQ1kP3mL5aN9bC/lethoc_cellphone_store_v65";
 
-  // Fallback public endpoint
-  var CLOUD_PUBLIC_URL = "https://api.npoint.io/e979a0b98544d673bf0b";
-
-  // SVG Fallback Data URI embedded for 100% image reliability
+  // SVG Fallback Data URI
   var SVG_FALLBACK = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230e131f'/%3E%3Cpath d='M160 90h80a20 20 0 0 1 20 20v100a20 20 0 0 1-20 20h-80a20 20 0 0 1-20-20V110a20 20 0 0 1 20-20z' fill='none' stroke='%2306b6d4' stroke-width='4'/%3E%3Ccircle cx='200' cy='210' r='6' fill='%2306b6d4'/%3E%3Crect x='180' y='102' width='40' height='4' rx='2' fill='%2306b6d4'/%3E%3Ctext x='200' y='250' font-family='sans-serif' font-size='14' font-weight='bold' fill='%2394a3b8' text-anchor='middle'%3ELETHOCCELLPHONE'S%3C/text%3E%3C/svg%3E";
 
-  // 1. DEFAULT INITIAL PRODUCTS WITH STABLE HIGH-RES URLS
+  // DEFAULT INITIAL PRODUCTS
   var DEFAULT_PRODUCTS = [
     {
       id: "prod-s21u",
@@ -55,7 +51,7 @@
     }
   ];
 
-  // 2. DEFAULT TESTIMONIALS
+  // DEFAULT TESTIMONIALS
   var DEFAULT_TESTIMONIALS = [
     {
       id: "test-1",
@@ -86,7 +82,7 @@
     }
   ];
 
-  // 3. DEFAULT SETTINGS
+  // DEFAULT SETTINGS
   var DEFAULT_SETTINGS = {
     storeName: "LETHOCCELLPHONE'S",
     hotline: "0934338765",
@@ -116,8 +112,7 @@
     cart: [],
     activeCategory: "all",
     activeHeroTab: "new",
-    isAdminLoggedIn: false,
-    isCloudSynced: false
+    isAdminLoggedIn: false
   };
 
   window.currentSpecsList = [];
@@ -127,9 +122,10 @@
     loadLocalData();
     renderAll();
     setupEvents();
-    syncFromCloudDatabase();
-    // Poll Cloud DB every 4 seconds so mobile phone updates automatically when PC edits data
-    setInterval(syncFromCloudDatabase, 4000);
+    syncFromCloudDB();
+    
+    // Automatically poll Cloud DB every 3 seconds to sync changes instantly
+    setInterval(syncFromCloudDB, 3000);
   }
 
   function loadLocalData() {
@@ -158,7 +154,7 @@
       localStorage.setItem("lethoccellphone_settings", JSON.stringify(state.settings));
       localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
     } catch(e) {}
-    pushToCloudDatabase();
+    pushToCloudDB();
   }
 
   function saveCart() {
@@ -168,17 +164,16 @@
     renderCart();
   }
 
-  // REALTIME ONLINE CLOUD DATABASE SYNC ENGINE
-  function pushToCloudDatabase() {
+  // PUSH TO CLOUD DATABASE (KVDB API)
+  function pushToCloudDB() {
     var payload = {
       products: state.products,
       settings: state.settings,
       testimonials: state.testimonials,
-      lastUpdated: Date.now()
+      timestamp: Date.now()
     };
 
-    // Push to npoint public Cloud bin
-    fetch(CLOUD_PUBLIC_URL, {
+    fetch(CLOUD_DB_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -189,9 +184,13 @@
     });
   }
 
-  function syncFromCloudDatabase() {
-    fetch(CLOUD_PUBLIC_URL)
-      .then(function(res) { return res.json(); })
+  // FETCH FROM CLOUD DATABASE (KVDB API)
+  function syncFromCloudDB() {
+    fetch(CLOUD_DB_URL)
+      .then(function(res) {
+        if (!res.ok) throw new Error("Cloud empty");
+        return res.json();
+      })
       .then(function(data) {
         if (data && data.products && Array.isArray(data.products)) {
           state.products = data.products;
@@ -209,15 +208,18 @@
         }
       })
       .catch(function() {
-        updateCloudBadge(false);
+        // If first run or offline, push default data to initialize cloud store
+        if (state.products.length > 0) {
+          pushToCloudDB();
+        }
       });
   }
 
-  function updateCloudBadge(isOnline) {
+  function updateCloudBadge(isSynced) {
     var badge = document.getElementById("cloud-sync-badge");
     if (!badge) return;
-    if (isOnline) {
-      badge.textContent = "🟢 Cloud Live Auto-Sync";
+    if (isSynced) {
+      badge.textContent = "🟢 Đã Đồng Bộ Cloud";
       badge.style.color = "#4ade80";
       badge.style.background = "rgba(74, 222, 128, 0.15)";
       badge.style.borderColor = "rgba(74, 222, 128, 0.4)";
@@ -797,7 +799,7 @@
     renderSpecsChips();
 
     window.closeAdminModalNow();
-    alert("🎉 CHÚC MỪNG! Đã đăng sản phẩm '" + title + "' lên Cloud thành công! Điện thoại và PC khác sẽ tự động có sản phẩm này!");
+    alert("🎉 CHÚC MỪNG! Đã đăng sản phẩm '" + title + "' thành công lên Cloud Database!");
     return false;
   };
 
@@ -834,7 +836,7 @@
     saveLocalData();
     applySettings();
     window.closeAdminModalNow();
-    alert("🎉 CHÚC MỪNG! Đã lưu Cấu Hình Cửa Hàng lên Cloud Database thành công!");
+    alert("🎉 CHÚC MỪNG! Đã lưu Cấu Hình Cửa Hàng thành công!");
     return false;
   };
 
@@ -877,7 +879,7 @@
     if (form) form.reset();
     window.toggleTestimonialFormDirectly();
 
-    alert("🎉 CHÚC MỪNG! Đã đăng Nhận Xét Khách Hàng mới lên Cloud Database!");
+    alert("🎉 CHÚC MỪNG! Đã đăng Nhận Xét Khách Hàng mới thành công!");
     return false;
   };
 
