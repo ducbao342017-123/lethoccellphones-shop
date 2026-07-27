@@ -119,6 +119,7 @@
   };
 
   window.currentSpecsList = [];
+  var _lastPushTime = 0;  // Timestamp of last local push – prevents sync from overwriting
 
   // Init Application
   function init() {
@@ -127,8 +128,8 @@
     setupEvents();
     syncFromCloudDB();
     
-    // Automatically poll Cloud DB every 3 seconds to sync changes instantly
-    setInterval(syncFromCloudDB, 3000);
+    // Automatically poll Cloud DB every 5 seconds to sync changes
+    setInterval(syncFromCloudDB, 5000);
   }
 
   function loadLocalData() {
@@ -162,11 +163,14 @@
 
   // PUSH TO CLOUD DATABASE (GitHub Gist PATCH)
   function pushToCloudDB() {
+    var now = Date.now();
+    _lastPushTime = now;   // Lock: block sync overwrite for 20 seconds
+
     var payload = {
       products: state.products,
       settings: state.settings,
       testimonials: state.testimonials,
-      timestamp: Date.now()
+      timestamp: now
     };
 
     var body = JSON.stringify({
@@ -198,6 +202,9 @@
 
   // FETCH FROM CLOUD DATABASE (GitHub Gist raw - with cache buster)
   function syncFromCloudDB() {
+    // If we just pushed local data, wait 20s before allowing cloud to overwrite
+    if (Date.now() - _lastPushTime < 20000) return;
+
     var rawUrl = GIST_RAW_BASE + "?t=" + Date.now();
     fetch(rawUrl, { cache: "no-store" })
       .then(function(res) {
@@ -206,17 +213,21 @@
       })
       .then(function(data) {
         if (data && data.products && Array.isArray(data.products)) {
-          state.products = data.products;
-          if (data.settings) state.settings = data.settings;
-          if (data.testimonials) state.testimonials = data.testimonials;
-          
-          try {
-            localStorage.setItem("lethoccellphone_products", JSON.stringify(state.products));
-            localStorage.setItem("lethoccellphone_settings", JSON.stringify(state.settings));
-            localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
-          } catch(err) {}
+          // Only overwrite local data if cloud data is NEWER than last local push
+          var cloudTs = data.timestamp || 0;
+          if (cloudTs >= _lastPushTime) {
+            state.products = data.products;
+            if (data.settings) state.settings = data.settings;
+            if (data.testimonials) state.testimonials = data.testimonials;
 
-          renderAll();
+            try {
+              localStorage.setItem("lethoccellphone_products", JSON.stringify(state.products));
+              localStorage.setItem("lethoccellphone_settings", JSON.stringify(state.settings));
+              localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
+            } catch(err) {}
+
+            renderAll();
+          }
           updateCloudBadge(true);
         } else {
           // If first run or empty, initialize cloud with default data
