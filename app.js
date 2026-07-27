@@ -1,15 +1,15 @@
 /* ==========================================================================
-   LETHOCCELLPHONE'S - HIGH-SPEED FIREBASE REALTIME CLOUD SYNC ENGINE (v70.0.0)
+   LETHOCCELLPHONE'S - HIGH-SPEED KVDB REALTIME CLOUD SYNC ENGINE (v75.0.0)
    ========================================================================== */
 
 (function() {
   'use strict';
 
-  var CURRENT_VERSION = "70.0.0";
+  var CURRENT_VERSION = "75.0.0";
   localStorage.setItem("lethoc_app_v", CURRENT_VERSION);
 
-  // Global Firebase RTDB REST Endpoint (100% free, open CORS, no rate limits, instant write/read)
-  var CLOUD_DB_URL = "https://lethoccellphone-default-rtdb.asia-southeast1.firebasedatabase.app/store.json";
+  // Dynamic KVDB endpoint linked to user's email legiang262@gmail.com
+  var CLOUD_DB_URL = "https://kvdb.io/BXbvnMCmVhpdkzGxGBCgrB/lethoc_store";
 
   // SVG Fallback Data URI
   var SVG_FALLBACK = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230e131f'/%3E%3Cpath d='M160 90h80a20 20 0 0 1 20 20v100a20 20 0 0 1-20 20h-80a20 20 0 0 1-20-20V110a20 20 0 0 1 20-20z' fill='none' stroke='%2306b6d4' stroke-width='4'/%3E%3Ccircle cx='200' cy='210' r='6' fill='%2306b6d4'/%3E%3Crect x='180' y='102' width='40' height='4' rx='2' fill='%2306b6d4'/%3E%3Ctext x='200' y='250' font-family='sans-serif' font-size='14' font-weight='bold' fill='%2394a3b8' text-anchor='middle'%3ELETHOCCELLPHONE'S%3C/text%3E%3C/svg%3E";
@@ -157,14 +157,7 @@
     pushToCloudDB();
   }
 
-  function saveCart() {
-    try {
-      localStorage.setItem("lethoccellphone_cart", JSON.stringify(state.cart));
-    } catch(e) {}
-    renderCart();
-  }
-
-  // PUSH TO CLOUD DATABASE (Firebase REST API using PUT)
+  // PUSH TO CLOUD DATABASE (KVDB API)
   function pushToCloudDB() {
     var payload = {
       products: state.products,
@@ -174,7 +167,7 @@
     };
 
     fetch(CLOUD_DB_URL, {
-      method: "PUT",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     }).then(function(res) {
@@ -188,7 +181,7 @@
     });
   }
 
-  // FETCH FROM CLOUD DATABASE (Firebase REST API)
+  // FETCH FROM CLOUD DATABASE (KVDB API)
   function syncFromCloudDB() {
     fetch(CLOUD_DB_URL)
       .then(function(res) {
@@ -210,7 +203,7 @@
           renderAll();
           updateCloudBadge(true);
         } else {
-          // If database is empty, initialize it with local/default data
+          // If first run or empty, initialize cloud with default data
           pushToCloudDB();
         }
       })
