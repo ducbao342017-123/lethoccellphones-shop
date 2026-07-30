@@ -6,7 +6,7 @@
 (function() {
   'use strict';
 
-  var CURRENT_VERSION = "80.0.0";
+  var CURRENT_VERSION = "83.0.0";
   localStorage.setItem("lethoc_app_v", CURRENT_VERSION);
 
   // Netlify Function proxy - token ẩn trong server, không lộ ra client
