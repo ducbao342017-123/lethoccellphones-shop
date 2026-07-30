@@ -366,17 +366,17 @@
 
       card.innerHTML = 
         badgeHTML +
-        '<div class="prod-img-box">' +
+        '<div class="prod-img-box" style="cursor: pointer;" onclick="openProductDetailDirectly(\'' + p.id + '\')">' +
           '<img src="' + imgSrc + '" alt="' + p.title + '" onerror="this.onerror=null; this.src=\'' + SVG_FALLBACK + '\';">' +
         '</div>' +
         '<div class="prod-category">' + (p.categoryName || p.category) + '</div>' +
-        '<h3 class="prod-title">' + p.title + '</h3>' +
+        '<h3 class="prod-title" style="cursor: pointer;" onclick="openProductDetailDirectly(\'' + p.id + '\')">' + p.title + '</h3>' +
         '<p class="prod-desc">' + (p.desc || "") + '</p>' +
         '<div class="prod-price-row">' +
           '<div class="prod-price">' + formatVND(p.price) + '</div>' +
         '</div>' +
         '<div style="display: flex; gap: 0.5rem;">' +
-          '<button class="btn btn-primary" onclick="buyProductDirectly(\'' + p.id + '\')" style="flex: 1; padding: 0.55rem; font-size: 0.8rem;"><i class="fa-solid fa-bolt"></i> Mua Ngay</button>' +
+          '<button class="btn btn-primary" onclick="openProductDetailDirectly(\'' + p.id + '\')" style="flex: 1; padding: 0.55rem; font-size: 0.8rem;"><i class="fa-solid fa-eye"></i> Xem Chi Tiết</button>' +
           '<button class="btn btn-emerald" onclick="addToCartDirectly(\'' + p.id + '\')" style="padding: 0.55rem 0.75rem; font-size: 0.8rem;" title="Thêm vào giỏ hàng"><i class="fa-solid fa-cart-shopping"></i></button>' +
         '</div>';
       grid.appendChild(card);
@@ -782,6 +782,8 @@
     var image = (document.getElementById("ap-image") || {}).value;
     var desc = (document.getElementById("ap-desc") || {}).value;
     var badge = (document.getElementById("ap-badge") || {}).value || "Mới về";
+    var video = (document.getElementById("ap-video") || {}).value || "";
+    var gifts = (document.getElementById("ap-gifts") || {}).value || "";
 
     if (!title || !priceVal) {
       alert("⚠️ Vui lòng nhập Tên sản phẩm và Giá bán!");
@@ -809,6 +811,8 @@
       image: image || SVG_FALLBACK,
       desc: desc || "Likenew",
       badge: badge,
+      video: video,
+      gifts: gifts,
       specs: window.currentSpecsList.length > 0 ? window.currentSpecsList : ["Chính hãng 100%", "Bảo hành 24 tháng"]
     };
 
@@ -934,11 +938,135 @@
     }
   };
 
-  window.quickViewDirectly = function(id) {
+  window.openProductDetailDirectly = function(id) {
     var p = state.products.find(function(item) { return item.id === id; });
-    if (p) {
-      alert("📱 " + p.title + "\nGiá: " + formatVND(p.price) + "\nDanh mục: " + (p.categoryName || p.category) + "\nMô tả: " + p.desc);
+    if (!p) return;
+
+    var modal = document.getElementById("product-detail-modal");
+    if (!modal) return;
+
+    // Populate data
+    var storeName = (state.settings && state.settings.storeName) ? state.settings.storeName : "LETHOCCELLPHONE'S";
+    var hotline = (state.settings && state.settings.hotline) ? state.settings.hotline : "0934338765";
+    var zalo = (state.settings && state.settings.zalo) ? state.settings.zalo : "0934338765";
+
+    var brandEl = document.getElementById("pd-logo-brand");
+    if (brandEl) brandEl.innerHTML = storeName.toUpperCase() + '<span>.</span>';
+
+    var hotlineValEl = document.getElementById("pd-header-hotline-val");
+    if (hotlineValEl) hotlineValEl.textContent = "📞 Hotline: " + hotline;
+
+    var badgeEl = document.getElementById("pd-badge-tag-val");
+    if (badgeEl) {
+      if (p.badge) {
+        badgeEl.textContent = p.badge;
+        badgeEl.style.display = "inline-block";
+      } else {
+        badgeEl.style.display = "none";
+      }
     }
+
+    var titleEl = document.getElementById("pd-title-val");
+    if (titleEl) titleEl.textContent = p.title;
+
+    var priceEl = document.getElementById("pd-price-val");
+    if (priceEl) priceEl.textContent = formatVND(p.price);
+
+    var mainImg = document.getElementById("pd-main-img");
+    if (mainImg) {
+      mainImg.src = p.image || SVG_FALLBACK;
+      mainImg.onerror = function() { this.src = SVG_FALLBACK; };
+    }
+
+    // Video embedding
+    var videoContainer = document.getElementById("pd-video-container");
+    if (videoContainer) {
+      videoContainer.innerHTML = "";
+      if (p.video) {
+        videoContainer.style.display = "block";
+        var isYoutube = p.video.length === 11 || p.video.indexOf("youtube.com") > -1 || p.video.indexOf("youtu.be") > -1;
+        if (isYoutube) {
+          var ytid = p.video;
+          if (ytid.indexOf("v=") > -1) {
+            ytid = ytid.split("v=")[1].split("&")[0];
+          } else if (ytid.indexOf("youtu.be/") > -1) {
+            ytid = ytid.split("youtu.be/")[1].split("?")[0];
+          }
+          videoContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/' + ytid + '?autoplay=1&mute=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+        } else {
+          videoContainer.innerHTML = '<video src="' + p.video + '" autoplay loop muted controls playsinline style="width:100%; height:100%; object-fit:cover;"></video>';
+        }
+      } else {
+        videoContainer.style.display = "none";
+      }
+    }
+
+    // Gifts
+    var giftsContainer = document.getElementById("pd-gifts-box-container");
+    var giftsVal = document.getElementById("pd-gifts-val");
+    if (giftsContainer && giftsVal) {
+      if (p.gifts) {
+        giftsVal.textContent = p.gifts;
+        giftsContainer.style.display = "block";
+      } else {
+        giftsContainer.style.display = "none";
+      }
+    }
+
+    // Clean hotline/zalo numbers for URL
+    var cleanHotline = hotline.replace(/\s+/g, "");
+    var cleanZalo = zalo.replace(/\s+/g, "");
+
+    // CTAs Zalo & Call
+    var zaloCta = document.getElementById("pd-zalo-cta");
+    if (zaloCta) {
+      zaloCta.href = "https://zalo.me/" + cleanZalo;
+    }
+
+    var phoneCta = document.getElementById("pd-phone-cta");
+    if (phoneCta) {
+      phoneCta.href = "tel:" + cleanHotline;
+      var ctaSpan = phoneCta.querySelector("span") || phoneCta;
+      ctaSpan.innerHTML = '<i class="fa-solid fa-phone-flip"></i> GỌI NGAY: ' + hotline;
+    }
+
+    // Specs list
+    var specsValEl = document.getElementById("pd-specs-list-val");
+    if (specsValEl) {
+      specsValEl.innerHTML = "";
+      var specs = p.specs || ["Chính hãng 100%", "Bảo hành 24 tháng"];
+      specs.forEach(function(spec) {
+        var li = document.createElement("li");
+        li.innerHTML = '<i class="fa-solid fa-circle-info" style="color: var(--accent-cyan);"></i> ' + spec;
+        specsValEl.appendChild(li);
+      });
+    }
+
+    // Mobile sticky bar setup
+    var stickyPhone = document.getElementById("sticky-phone-btn");
+    if (stickyPhone) {
+      stickyPhone.href = "tel:" + cleanHotline;
+    }
+
+    var stickyZalo = document.getElementById("sticky-zalo-btn");
+    if (stickyZalo) {
+      stickyZalo.href = "https://zalo.me/" + cleanZalo;
+    }
+
+    // Open modal
+    modal.classList.add("active");
+    document.body.classList.add("product-detail-modal-active");
+  };
+
+  window.closeProductDetailModalDirectly = function() {
+    var modal = document.getElementById("product-detail-modal");
+    if (modal) modal.classList.remove("active");
+    
+    // Stop video playback by clearing innerHTML
+    var videoContainer = document.getElementById("pd-video-container");
+    if (videoContainer) videoContainer.innerHTML = "";
+
+    document.body.classList.remove("product-detail-modal-active");
   };
 
   window.setBannerWidthDirectly = function(mode) {

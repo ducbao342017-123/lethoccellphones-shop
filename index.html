@@ -212,6 +212,104 @@
     </div>
   </div>
 
+  <!-- ==================== PRODUCT DETAIL LANDING MODAL ==================== -->
+  <div class="modal-overlay" id="product-detail-modal">
+    <div class="modal-box product-detail-box" style="max-width: 900px; padding: 0;">
+      
+      <!-- Header -->
+      <div class="pd-header">
+        <div class="pd-header-brand">
+          <span class="logo-brand" id="pd-logo-brand">LÊ THÓC CELLPHONE'S<span>.</span></span>
+        </div>
+        <div class="pd-header-right">
+          <span class="pd-header-hotline" id="pd-header-hotline-val">📞 Hotline: 0934338765</span>
+          <button type="button" onclick="closeProductDetailModalDirectly()" class="modal-close" style="position: static; margin-left: 1rem;">×</button>
+        </div>
+      </div>
+
+      <div class="pd-body">
+        <div class="pd-grid">
+          
+          <!-- Column 1: Showcase (Images/Video) -->
+          <div class="pd-showcase">
+            <div class="pd-badge-container">
+              <span class="prod-badge-tag" id="pd-badge-tag-val">Mới về</span>
+            </div>
+            
+            <!-- Video Showcase if exists -->
+            <div class="pd-video-wrapper" id="pd-video-container" style="display: none;">
+              <!-- Embedded via JS -->
+            </div>
+
+            <!-- Image Showcase -->
+            <div class="pd-image-wrapper">
+              <img id="pd-main-img" src="" alt="Sản phẩm" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%230e131f\'/%3E%3Cpath d=\'M160 90h80a20 20 0 0 1 20 20v100a20 20 0 0 1-20 20h-80a20 20 0 0 1-20-20V110a20 20 0 0 1 20-20z\' fill=\'none\' stroke=\'%2306b6d4\' stroke-width=\'4\'/%3E%3Ccircle cx=\'200\' cy=\'210\' r=\'6\' fill=\'%2306b6d4\'/%3E%3Crect x=\'180\' y=\'102\' width=\'40\' height=\'4\' rx=\'2\' fill=\'%2306b6d4\'/%3E%3Ctext x=\'200\' y=\'250\' font-family=\'sans-serif\' font-size=\'14\' font-weight=\'bold\' fill=\'%2394a3b8\' text-anchor=\'middle\'%3ELETHOCCELLPHONE\'S%3C/text%3E%3C/svg%3E'">
+            </div>
+          </div>
+
+          <!-- Column 2: Details & CTAs -->
+          <div class="pd-info-panel">
+            <h2 class="pd-title" id="pd-title-val">Tên sản phẩm</h2>
+            
+            <div class="pd-price-row">
+              <span class="pd-price-label">Giá bán:</span>
+              <span class="pd-price" id="pd-price-val">9,990,000đ</span>
+            </div>
+
+            <!-- Gift box section -->
+            <div class="pd-gifts-box" id="pd-gifts-box-container" style="display: none;">
+              <h4>🎁 QUÀ TẶNG & ƯU ĐÃI ĐI KÈM:</h4>
+              <p id="pd-gifts-val">Chưa có quà tặng nào.</p>
+            </div>
+
+            <!-- Primary CTAs -->
+            <div class="pd-cta-block">
+              <a href="" id="pd-zalo-cta" class="pd-btn pd-btn-zalo" target="_blank">
+                <i class="fa-solid fa-comments"></i> NHẮN ZALO NHẬN GIÁ SỐC & TƯ VẤN NHANH
+              </a>
+              <a href="" id="pd-phone-cta" class="pd-btn pd-btn-phone">
+                <i class="fa-solid fa-phone-flip"></i> GỌI NGAY CHỐT ĐƠN
+              </a>
+            </div>
+
+            <!-- Technical details / Specs -->
+            <div class="pd-specs-section">
+              <h4>📋 THÔNG SỐ KỸ THUẬT:</h4>
+              <ul class="pd-specs-list" id="pd-specs-list-val">
+                <!-- Rendered via JS -->
+              </ul>
+            </div>
+
+            <!-- Commitments block -->
+            <div class="pd-commitments">
+              <div class="pd-commit-item">
+                <i class="fa-solid fa-circle-check" style="color: var(--accent-emerald);"></i>
+                <span>Cam kết chuẩn 100% như mô tả và video thực tế.</span>
+              </div>
+              <div class="pd-commit-item">
+                <i class="fa-solid fa-shield-halved" style="color: var(--accent-blue);"></i>
+                <span>Chính sách bảo hành uy tín, hỗ trợ kỹ thuật tận tâm.</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Sticky Bottom Bar for Mobile -->
+  <div class="sticky-bottom-bar" id="mobile-sticky-cta-bar">
+    <a href="" id="sticky-phone-btn" class="sticky-cta-btn sticky-btn-phone">
+      <i class="fa-solid fa-phone"></i> Gọi Điện
+    </a>
+    <a href="" id="sticky-zalo-btn" class="sticky-cta-btn sticky-btn-zalo" target="_blank">
+      <i class="fa-solid fa-comments"></i> Chat Zalo
+    </a>
+  </div>
+
   <!-- ==================== CHECKOUT FORM MODAL ==================== -->
   <div class="modal-overlay" id="checkout-modal">
     <div class="modal-box" style="max-width: 550px;">
@@ -324,6 +422,16 @@
                 <div class="form-group">
                   <label class="form-label">Mô Tả Ngắn Sản Phẩm</label>
                   <textarea id="ap-desc" class="form-input" placeholder="Ví dụ: Likenew..." style="height: 80px; resize: none;"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Video Review Ngắn (YouTube Video ID hoặc Link Video)</label>
+                  <input type="text" id="ap-video" class="form-input" placeholder="Ví dụ: 1r0Ux7Z5nE4 hoặc link video">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Quà Tặng & Ưu Đãi Đi Kèm</label>
+                  <input type="text" id="ap-gifts" class="form-input" placeholder="Ví dụ: Tặng cáp sạc nhanh 25W, ốp lưng, cường lực">
                 </div>
 
                 <div class="form-group">
