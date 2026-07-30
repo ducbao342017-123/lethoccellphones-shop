@@ -427,6 +427,13 @@
                 <div class="form-group">
                   <label class="form-label">Video Review Ngắn (YouTube Video ID hoặc Link Video)</label>
                   <input type="text" id="ap-video" class="form-input" placeholder="Ví dụ: 1r0Ux7Z5nE4 hoặc link video">
+                  <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                    <button type="button" onclick="triggerVideoFilePickerDirectly()" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;">
+                      📹 TẢI VIDEO TỪ THIẾT BỊ
+                    </button>
+                    <input type="file" id="ap-video-file" onchange="handleVideoFileUploadDirectly(this)" accept="video/*" style="display: none;">
+                  </div>
+                  <div id="ap-video-preview-container" style="display: none; margin-top: 0.5rem;"></div>
                 </div>
 
                 <div class="form-group">

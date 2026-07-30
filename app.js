@@ -711,6 +711,38 @@
     reader.readAsDataURL(file);
   };
 
+  window.handleVideoFileUploadDirectly = function(input) {
+    if (!input || !input.files || input.files.length === 0) return;
+    var file = input.files[0];
+    
+    // Giới hạn 3.5MB tránh quá tải bộ nhớ đệm
+    if (file.size > 3.5 * 1024 * 1024) {
+      alert("❌ Video quá lớn! Vui lòng chọn video dưới 3.5MB để đảm bảo đồng bộ mượt mà.");
+      input.value = "";
+      return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var base64 = e.target.result;
+      var apVideo = document.getElementById("ap-video");
+      if (apVideo) apVideo.value = base64;
+
+      var box = document.getElementById("ap-video-preview-container");
+      if (box) {
+        box.style.display = "block";
+        box.innerHTML = '<div style="display:flex; align-items:center; gap:0.5rem; color:#60a5fa; font-weight:700; font-size:0.85rem;"><i class="fa-solid fa-circle-check" style="color:#10b981;"></i> ✅ Đã nạp video sản phẩm thành công!</div>';
+      }
+      alert("🎉 Nạp video sản phẩm từ thiết bị thành công!");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.triggerVideoFilePickerDirectly = function() {
+    var fileInput = document.getElementById("ap-video-file");
+    if (fileInput) fileInput.click();
+  };
+
   window.handleHeroImageFileUploadDirectly = function(input) {
     if (!input || !input.files || input.files.length === 0) return;
     var file = input.files[0];
@@ -824,6 +856,10 @@
 
     var form = document.getElementById("admin-product-form");
     if (form) form.reset();
+    var imgPreview = document.getElementById("ap-image-preview-container");
+    if (imgPreview) { imgPreview.innerHTML = ""; imgPreview.style.display = "none"; }
+    var vidPreview = document.getElementById("ap-video-preview-container");
+    if (vidPreview) { vidPreview.innerHTML = ""; vidPreview.style.display = "none"; }
     window.currentSpecsList = [];
     renderSpecsChips();
 
