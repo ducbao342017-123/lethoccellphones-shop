@@ -110,6 +110,7 @@
     products: [],
     settings: DEFAULT_SETTINGS,
     testimonials: DEFAULT_TESTIMONIALS,
+    orders: [],
     cart: [],
     activeCategory: "all",
     activeHeroTab: "new",
@@ -141,6 +142,9 @@
       var t = localStorage.getItem("lethoccellphone_testimonials");
       state.testimonials = t !== null ? JSON.parse(t) : DEFAULT_TESTIMONIALS;
 
+      var o = localStorage.getItem("lethoccellphone_orders");
+      state.orders = o !== null ? JSON.parse(o) : [];
+
       var c = localStorage.getItem("lethoccellphone_cart");
       if (c) state.cart = JSON.parse(c);
     } catch(e) {
@@ -155,6 +159,7 @@
       localStorage.setItem("lethoccellphone_products", JSON.stringify(state.products));
       localStorage.setItem("lethoccellphone_settings", JSON.stringify(state.settings));
       localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
+      localStorage.setItem("lethoccellphone_orders", JSON.stringify(state.orders));
     } catch(e) {}
     pushToCloudDB();
   }
@@ -168,6 +173,7 @@
       products: state.products,
       settings: state.settings,
       testimonials: state.testimonials,
+      orders: state.orders,
       timestamp: now
     });
 
@@ -199,11 +205,13 @@
             state.products = data.products;
             if (data.settings) state.settings = data.settings;
             if (data.testimonials) state.testimonials = data.testimonials;
+            if (data.orders) state.orders = data.orders;
 
             try {
               localStorage.setItem("lethoccellphone_products", JSON.stringify(state.products));
               localStorage.setItem("lethoccellphone_settings", JSON.stringify(state.settings));
               localStorage.setItem("lethoccellphone_testimonials", JSON.stringify(state.testimonials));
+              localStorage.setItem("lethoccellphone_orders", JSON.stringify(state.orders));
             } catch(err) {}
 
             renderAllSafe();
@@ -239,6 +247,7 @@
     renderAdminProductsTable();
     renderTestimonials();
     renderAdminTestimonialsTable();
+    renderAdminOrdersTable();
     applySettings();
     renderCart();
   }
@@ -249,6 +258,7 @@
     renderAdminProductsTable();
     renderTestimonials();
     renderAdminTestimonialsTable();
+    renderAdminOrdersTable();
     applySettingsUI();  // Chỉ cập nhật giao diện công khai, KHÔNG reset form
     renderCart();
   }
@@ -603,6 +613,31 @@
       return false;
     }
 
+    var total = state.cart.reduce(function(acc, item) { return acc + item.price * item.quantity; }, 0);
+    var products = state.cart.map(function(item) { return item.title + " (SL: " + item.quantity + ")"; }).join(", ");
+
+    var newOrder = {
+      id: "order-" + Date.now(),
+      name: name,
+      phone: phone,
+      address: address,
+      products: products,
+      total: total,
+      dateStr: new Date().toLocaleString("vi-VN")
+    };
+
+    state.orders.unshift(newOrder);
+    saveLocalData();
+    renderAdminOrdersTable();
+
+    // Reset form inputs
+    var nameInput = document.getElementById("co-name");
+    var phoneInput = document.getElementById("co-phone");
+    var addrInput = document.getElementById("co-address");
+    if (nameInput) nameInput.value = "";
+    if (phoneInput) phoneInput.value = "";
+    if (addrInput) addrInput.value = "";
+
     alert("🎉 ĐẶT HÀNG THÀNH CÔNG!\nCảm ơn khách hàng " + name + " (" + phone + "). Nhân viên cửa hàng sẽ gọi xác nhận giao hàng đến " + address + " trong 15 phút!");
     state.cart = [];
     saveCart();
@@ -611,7 +646,7 @@
   };
 
   window.switchAdminTabDirectly = function(tab) {
-    var tabs = ["list", "form", "settings", "testimonials"];
+    var tabs = ["list", "form", "settings", "testimonials", "orders"];
     tabs.forEach(function(t) {
       var btn = document.getElementById("tab-btn-" + t);
       var content = document.getElementById("tab-content-" + t);
@@ -1114,6 +1149,88 @@
       heroBox.style.margin = "0 auto";
     }
   };
+
+  window.toggleOrderFormDirectly = function() {
+    var wrapper = document.getElementById("order-form-wrapper");
+    if (!wrapper) return;
+    if (wrapper.style.display === "none") {
+      wrapper.style.display = "block";
+    } else {
+      wrapper.style.display = "none";
+      var form = document.getElementById("admin-order-form");
+      if (form) form.reset();
+    }
+  };
+
+  window.saveOrderFormDirectly = function(e) {
+    if (e) e.preventDefault();
+    var name = (document.getElementById("ao-name") || {}).value;
+    var phone = (document.getElementById("ao-phone") || {}).value;
+    var address = (document.getElementById("ao-address") || {}).value;
+    var products = (document.getElementById("ao-products") || {}).value;
+    var totalVal = (document.getElementById("ao-total") || {}).value || "0";
+
+    if (!name || !phone || !address || !products) {
+      alert("⚠️ Vui lòng điền đầy đủ các thông tin bắt buộc!");
+      return false;
+    }
+
+    var total = parseInt(totalVal.toString().replace(/\D/g, ""), 10) || 0;
+
+    var newOrder = {
+      id: "order-" + Date.now(),
+      name: name,
+      phone: phone,
+      address: address,
+      products: products,
+      total: total,
+      dateStr: new Date().toLocaleString("vi-VN")
+    };
+
+    state.orders.unshift(newOrder);
+    saveLocalData();
+    renderAdminOrdersTable();
+
+    window.toggleOrderFormDirectly();
+    alert("🎉 Đã thêm thông tin khách chờ mua hàng thành công!");
+    return false;
+  };
+
+  window.deleteOrderDirectly = function(idx) {
+    if (confirm("Bạn có chắc chắn muốn xóa thông tin khách chờ mua hàng này?")) {
+      state.orders.splice(idx, 1);
+      saveLocalData();
+      renderAdminOrdersTable();
+      alert("✅ Đã xóa thông tin thành công!");
+    }
+  };
+
+  function renderAdminOrdersTable() {
+    var tbody = document.getElementById("admin-orders-table-body");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    if (!state.orders || state.orders.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="padding: 2rem; text-align: center; color: var(--text-muted);">Chưa có khách chờ mua hàng nào trong danh sách.</td></tr>';
+      return;
+    }
+
+    state.orders.forEach(function(o, idx) {
+      var tr = document.createElement("tr");
+      tr.style.borderBottom = "1px solid var(--border-glass)";
+      tr.innerHTML = 
+        '<td style="padding: 0.75rem; font-size: 0.8rem; color: var(--text-muted);">' + (o.dateStr || "Vừa xong") + '</td>' +
+        '<td style="padding: 0.75rem; font-weight: 700;">' + o.name + '</td>' +
+        '<td style="padding: 0.75rem; font-weight: 700; color: var(--accent-cyan);">' + o.phone + '</td>' +
+        '<td style="padding: 0.75rem; font-size: 0.85rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + o.address + '">' + o.address + '</td>' +
+        '<td style="padding: 0.75rem; font-size: 0.85rem; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + o.products + '">' + o.products + '</td>' +
+        '<td style="padding: 0.75rem; font-weight: 700; color: var(--accent-emerald);">' + formatVND(o.total) + '</td>' +
+        '<td style="padding: 0.75rem; text-align: center;">' +
+          '<button class="btn btn-secondary" onclick="deleteOrderDirectly(' + idx + ')" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; color: #f87171; border-color: #f87171;">Xóa</button>' +
+        '</td>';
+      tbody.appendChild(tr);
+    });
+  }
 
   function setupEvents() {
     document.addEventListener("keydown", function(e) {
